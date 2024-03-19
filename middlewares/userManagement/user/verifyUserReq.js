@@ -448,13 +448,15 @@ validateUsersWithoutTeam = async (req, res, next) => {
             }
         }
 
-        let invalidUserIdsWithoutTeam = await UserDbOperations.returnUsersWithoutTeam(req.body.users, req.businessUnit);
-        if (invalidUserIdsWithoutTeam.length > 0) {
+        let usersWithoutTeam = await UserDbOperations.returnUsersWithoutTeam(req.body.users, req.businessUnit);
+        if (req.body.users.length !== usersWithoutTeam.length) {
+
+            let usersWithTeam = req.body.appendUsers.filter(user => !usersWithoutTeam.includes(user));
             return apiResponseHandler.errorResponse(
                 res,
-                "Failed! Invalid User ids",
+                "Failed! Users already have team",
                 400,
-                {invalidUserIdsWithoutTeam}
+                {usersWithTeam}
             );
         }
         else{
